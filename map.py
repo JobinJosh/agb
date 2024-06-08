@@ -14,18 +14,18 @@ class Person:
         self.accommodation = None
 
     def choose_accommodation(self):
-        if self.income > 130 and self.education in ['Undergraduate', 'Postgraduate']:
+        if self.income > 130 and self.education in ['Undergraduate', 'Postgraduate'] and self.employment == 'Employed':
             self.accommodation = 'Luxury Apartment'
+        elif self.income > 100 and self.social_status == 'Family' and self.employment == 'Employed':
+            self.accommodation = 'House'
         elif 50 <= self.income <= 130:
             self.accommodation = 'Standard Apartment'
-        elif self.income < 50 and self.social_status == 'Single':
+        elif self.income < 50 and self.social_status == 'Single' and self.employment == 'Unemployed':
             self.accommodation = 'Shared Housing'
-        elif self.income < 50 and self.social_status == 'Family':
+        elif self.income < 50 and self.social_status == 'Family' and self.employment == 'Unemployed':
             self.accommodation = 'Public Housing'
-        elif 0 <= self.income <= 250:
+        elif self.employment == 'Unemployed' and self.income <= 250:
             self.accommodation = 'Public Housing'
-        elif self.social_status == 'Family' and self.income >= 50:
-            self.accommodation = 'House'
         else:
             self.accommodation = 'Undefined'
 
@@ -33,9 +33,9 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
     persons = []
     accommodation_counts = {
         'Luxury Apartment': 0,
+        'House': 0,
         'Standard Apartment': 0,
         'Shared Housing': 0,
-        'House': 0,
         'Public Housing': 0,
         'Undefined': 0
     }
