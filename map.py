@@ -20,11 +20,13 @@ class Person:
             self.accommodation = 'House'
         elif 50 <= self.income <= 130:
             self.accommodation = 'Standard Apartment'
-        elif self.income < 50 and self.social_status == 'Single' and self.employment == 'Unemployed':
+        elif self.income <= 50 and self.social_status == 'Single' and self.employment == 'Unemployed':
             self.accommodation = 'Shared Housing'
-        elif self.income < 50 and self.social_status == 'Family' and self.employment == 'Unemployed':
+        elif self.income <= 50 and self.social_status == 'Single':
+            self.accommodation = 'Shared Housing'
+        elif self.income <= 50 and self.social_status == 'Family' and self.employment == 'Unemployed':
             self.accommodation = 'Public Housing'
-        elif self.employment == 'Unemployed' and self.income <= 250:
+        elif self.income <= 250 and self.employment == 'Unemployed':
             self.accommodation = 'Public Housing'
         else:
             self.accommodation = 'Undefined'
