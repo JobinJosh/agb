@@ -61,10 +61,20 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
     counts = list(accommodation_counts.values())
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(labels, counts, color=['blue', 'green', 'red', 'purple', 'orange', 'gray'])
+    bars = ax.bar(labels, counts, color=['blue', 'green', 'red', 'purple', 'orange', 'gray'])
     ax.set_xlabel('Accommodation Type')
     ax.set_ylabel('Number of People')
     ax.set_title(f'Accommodation Choices of {num_persons} Persons')
+    
+    # Add text annotations on bars
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
     st.pyplot(fig)
 
 # Streamlit UI
