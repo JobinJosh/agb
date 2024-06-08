@@ -24,10 +24,12 @@ class Person:
             self.accommodation = 'House'
         elif self.income < 50 and self.social_status == 'Family':
             self.accommodation = 'Public Housing'
+        elif 0 <= self.income <= 250:
+            self.accommodation = 'Public Housing'
         else:
             self.accommodation = 'Undefined'
 
-def create_persons_and_plot(num_persons, education_probs, employment_probs, income_levels, social_status_probs, relatives_abroad_prob):
+def create_persons_and_plot(num_persons, education_probs, employment_probs, income_probs, social_status_probs, relatives_abroad_prob):
     persons = []
     accommodation_counts = {
         'Luxury Apartment': 0,
@@ -46,7 +48,7 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
             education_probs if gender == 'Female' else education_probs
         )[0]
         employment = random.choices(['Employed', 'Unemployed'], employment_probs)[0]
-        income = random.choices(income_levels, [0.1, 0.4, 0.5])[0]
+        income = random.choices([100, 350, 1000], income_probs)[0]
         social_status = random.choices(['Single', 'Family'], social_status_probs)[0]
         relatives_abroad = random.choices(['Yes', 'No'], [relatives_abroad_prob, 1 - relatives_abroad_prob])[0]
 
@@ -84,7 +86,11 @@ employment_probs = [
     st.slider('Unemployed Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.93)
 ]
 
-income_levels = [100, 350, 1000]
+income_probs = [
+    st.slider('Income $0-250 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.1),
+    st.slider('Income $250-500 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.4),
+    st.slider('Income $500+ Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.5)
+]
 
 social_status_probs = [
     st.slider('Single Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.51),
@@ -94,4 +100,4 @@ social_status_probs = [
 relatives_abroad_prob = st.slider('Relatives Abroad Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.18)
 
 if st.button('Run Model'):
-    create_persons_and_plot(num_persons, education_probs, employment_probs, income_levels, social_status_probs, relatives_abroad_prob)
+    create_persons_and_plot(num_persons, education_probs, employment_probs, income_probs, social_status_probs, relatives_abroad_prob)
