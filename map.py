@@ -20,12 +20,12 @@ class Person:
             self.accommodation = 'Standard Apartment'
         elif self.income < 50 and self.social_status == 'Single':
             self.accommodation = 'Shared Housing'
-        elif self.social_status == 'Family' and self.income >= 50:
-            self.accommodation = 'House'
         elif self.income < 50 and self.social_status == 'Family':
             self.accommodation = 'Public Housing'
         elif 0 <= self.income <= 250:
             self.accommodation = 'Public Housing'
+        elif self.social_status == 'Family' and self.income >= 50:
+            self.accommodation = 'House'
         else:
             self.accommodation = 'Undefined'
 
@@ -48,7 +48,7 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
             education_probs if gender == 'Female' else education_probs
         )[0]
         employment = random.choices(['Employed', 'Unemployed'], employment_probs)[0]
-        income = random.choices([100, 350, 1000], income_probs)[0]
+        income = random.choices([100, 250, 500], income_probs)[0]
         social_status = random.choices(['Single', 'Family'], social_status_probs)[0]
         relatives_abroad = random.choices(['Yes', 'No'], [relatives_abroad_prob, 1 - relatives_abroad_prob])[0]
 
@@ -97,9 +97,9 @@ employment_probs = [
 ]
 
 income_probs = [
-    st.slider('Income $0-250 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.1),
-    st.slider('Income $250-500 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.4),
-    st.slider('Income $500+ Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.5)
+    st.slider('Income $0-250 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.4),
+    st.slider('Income $250-500 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.3),
+    st.slider('Income $500+ Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.3)
 ]
 
 social_status_probs = [
