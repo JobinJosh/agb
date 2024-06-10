@@ -2,6 +2,7 @@ import random
 import matplotlib.pyplot as plt
 import streamlit as st
 
+# Class to represent a person with various attributes
 class Person:
     def __init__(self, age, gender, education, employment, income, social_status, relatives_abroad):
         self.age = age
@@ -13,6 +14,7 @@ class Person:
         self.relatives_abroad = relatives_abroad
         self.accommodation = None
 
+    # Method to determine the accommodation type based on person's attributes
     def choose_accommodation(self):
         if self.income > 130 and self.education in ['Undergraduate', 'Postgraduate']:
             self.accommodation = 'Luxury Apartment'
@@ -29,6 +31,7 @@ class Person:
         else:
             self.accommodation = 'Undefined'
 
+# Function to create persons, simulate accommodation choices, and plot results
 def create_persons_and_plot(num_persons, education_probs, employment_probs, income_probs, social_status_probs, relatives_abroad_prob):
     persons = []
     accommodation_counts = {
@@ -45,7 +48,7 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
         gender = random.choices(['Female', 'Male'], [0.49, 0.51])[0]
         education = random.choices(
             ['No education', 'Primary', 'Secondary', 'Technical', 'Undergraduate', 'Postgraduate'],
-            education_probs if gender == 'Female' else education_probs
+            education_probs
         )[0]
         employment = random.choices(['Employed', 'Unemployed'], employment_probs)[0]
         income = random.choices([100, 350, 1000], income_probs)[0]
@@ -79,6 +82,7 @@ def create_persons_and_plot(num_persons, education_probs, employment_probs, inco
 
     return persons, accommodation_counts
 
+# Function to plot resource usage
 def plot_resource_usage(resource, usage_counts, labels):
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(labels, usage_counts, color=['blue', 'green', 'red', 'purple', 'orange', 'gray'])
@@ -97,6 +101,7 @@ def plot_resource_usage(resource, usage_counts, labels):
 
     st.pyplot(fig)
 
+# Function to calculate resource usage based on accommodation types
 def calculate_resource_usage(persons):
     # Parameters for resource usage based on European standards
     accommodation_needs = {
@@ -187,4 +192,8 @@ def calculate_resource_usage(persons):
 # Streamlit UI
 st.title('Accommodation Choices Based on Person Attributes')
 
-num_persons = st.slider('
+num_persons = st.slider('Number of Persons', min_value=10, max_value=1000, value=100, step=10)
+education_probs = st.slider('Education Probabilities', 0.0, 1.0, (0.1, 0.2, 0.2, 0.2, 0.2, 0.1), key="education_probs")
+employment_probs = st.slider('Employment Probabilities', 0.0, 1.0, (0.8, 0.2), key="employment_probs")
+income_probs = st.slider('Income Probabilities', 0.0, 1.0, (0.4, 0.3, 0.3), key="income_probs")
+social_status_probs = st.slider('Social Status Probabilities',
