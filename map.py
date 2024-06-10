@@ -98,42 +98,42 @@ def plot_resource_usage(resource, usage_counts, labels):
     st.pyplot(fig)
 
 def calculate_resource_usage(persons):
-    # Parameters for resource usage
+    # Parameters for resource usage based on European standards
     accommodation_needs = {
         'Luxury Apartment': {
-            'water': 150,  # gallons per person per day
-            'electricity': 15,  # kWh per person per day
-            'heating': 60,  # BTUs per sqft per hour
-            'cooling': 30,  # BTUs per sqft per hour
-            'land': 700  # sqft per person
+            'water': 300,  # liters per person per day
+            'electricity': 20,  # kWh per person per day
+            'heating': 75,  # MJ per sqm per year, converted below
+            'cooling': 37.5,  # MJ per sqm per year, converted below
+            'land': 65  # sqm per person
         },
         'House': {
-            'water': 120,
-            'electricity': 12,
-            'heating': 50,
-            'cooling': 25,
-            'land': 600
+            'water': 250,
+            'electricity': 15,
+            'heating': 70,
+            'cooling': 35,
+            'land': 55
         },
         'Standard Apartment': {
-            'water': 100,
+            'water': 200,
             'electricity': 10,
-            'heating': 40,
-            'cooling': 20,
-            'land': 500
+            'heating': 65,
+            'cooling': 32.5,
+            'land': 46
         },
         'Shared Housing': {
-            'water': 80,
-            'electricity': 8,
-            'heating': 30,
-            'cooling': 15,
-            'land': 400
+            'water': 150,
+            'electricity': 7,
+            'heating': 60,
+            'cooling': 30,
+            'land': 37
         },
         'Public Housing': {
-            'water': 60,
-            'electricity': 6,
-            'heating': 20,
-            'cooling': 10,
-            'land': 300
+            'water': 100,
+            'electricity': 5,
+            'heating': 55,
+            'cooling': 27.5,
+            'land': 28
         },
         'Undefined': {
             'water': 0,
@@ -144,11 +144,26 @@ def calculate_resource_usage(persons):
         }
     }
 
+    # Convert annual MJ per sqm to daily MJ per person
+    days_per_year = 365
+    persons_per_accommodation = {
+        'Luxury Apartment': 1.5,  # assuming 1.5 persons per luxury apartment
+        'House': 3,  # assuming 3 persons per house
+        'Standard Apartment': 2,  # assuming 2 persons per standard apartment
+        'Shared Housing': 4,  # assuming 4 persons per shared housing
+        'Public Housing': 4,  # assuming 4 persons per public housing
+        'Undefined': 1
+    }
+
+    for accommodation, needs in accommodation_needs.items():
+        needs['heating'] = (needs['heating'] * persons_per_accommodation[accommodation]) / days_per_year
+        needs['cooling'] = (needs['cooling'] * persons_per_accommodation[accommodation]) / days_per_year
+
     # Initialize totals
     total_water_usage = 0
     total_electricity_usage = 0
-    total_heating_btu = 0
-    total_cooling_btu = 0
+    total_heating_mj = 0
+    total_cooling_mj = 0
     total_land = 0
 
     # Initialize accommodation-specific counts
@@ -163,8 +178,8 @@ def calculate_resource_usage(persons):
         needs = accommodation_needs[person.accommodation]
         accommodation_water[person.accommodation] += needs['water']
         accommodation_electricity[person.accommodation] += needs['electricity']
-        accommodation_heating[person.accommodation] += needs['heating'] * needs['land'] / 1000
-        accommodation_cooling[person.accommodation] += needs['cooling'] * needs['land'] / 1000
+        accommodation_heating[person.accommodation] += needs['heating']
+        accommodation_cooling[person.accommodation] += needs['cooling']
         accommodation_land[person.accommodation] += needs['land']
 
     return accommodation_water, accommodation_electricity, accommodation_heating, accommodation_cooling, accommodation_land
@@ -172,52 +187,4 @@ def calculate_resource_usage(persons):
 # Streamlit UI
 st.title('Accommodation Choices Based on Person Attributes')
 
-num_persons = st.slider('Number of Persons', min_value=1000, max_value=20000, step=1000, value=10000)
-
-education_probs = [
-    st.slider('No Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.02),
-    st.slider('Primary Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.115),
-    st.slider('Secondary Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.515),
-    st.slider('Technical Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.13),
-    st.slider('Undergraduate Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.25),
-    st.slider('Postgraduate Education Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.03)
-]
-
-employment_probs = [
-    st.slider('Employed Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.07),
-    st.slider('Unemployed Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.93)
-]
-
-income_probs = [
-    st.slider('Income $0-250 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.1),
-    st.slider('Income $250-500 Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.4),
-    st.slider('Income $500+ Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.5)
-]
-
-social_status_probs = [
-    st.slider('Single Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.51),
-    st.slider('Family Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.47)
-]
-
-relatives_abroad_prob = st.slider('Relatives Abroad Probability', min_value=0.0, max_value=1.0, step=0.01, value=0.18)
-
-if st.button('Run Model'):
-    persons, accommodation_counts = create_persons_and_plot(num_persons, education_probs, employment_probs, income_probs, social_status_probs, relatives_abroad_prob)
-
-    accommodation_water, accommodation_electricity, accommodation_heating, accommodation_cooling, accommodation_land = calculate_resource_usage(persons)
-
-    plot_resource_usage('Water', list(accommodation_water.values()), list(accommodation_water.keys()))
-    plot_resource_usage('Electricity', list(accommodation_electricity.values()), list(accommodation_electricity.keys()))
-    plot_resource_usage('Heating', list(accommodation_heating.values()), list(accommodation_heating.keys()))
-    plot_resource_usage('Cooling', list(accommodation_cooling.values()), list(accommodation_cooling.keys()))
-    plot_resource_usage('Land', list(accommodation_land.values()), list(accommodation_land.keys()))
-
-    # Convert water usage to liters
-    total_water_usage_liters = sum(accommodation_water.values()) * 3.785
-
-    # Display the results
-    st.write(f"Total Water Usage: {sum(accommodation_water.values()):.2f} gallons per day ({total_water_usage_liters:.2f} liters per day)")
-    st.write(f"Total Electricity Usage: {sum(accommodation_electricity.values()):.2f} kWh per day")
-    st.write(f"Total Heating Requirement: {sum(accommodation_heating.values()):.2f} BTUs per hour")
-    st.write(f"Total Cooling Requirement: {sum(accommodation_cooling.values()):.2f} BTUs per hour")
-    st.write(f"Total Land Required: {sum(accommodation_land.values()):.2f} sqft")
+num_persons = st.slider('
