@@ -193,7 +193,35 @@ def calculate_resource_usage(persons):
 st.title('Accommodation Choices Based on Person Attributes')
 
 num_persons = st.slider('Number of Persons', min_value=10, max_value=1000, value=100, step=10)
-education_probs = st.slider('Education Probabilities', 0.0, 1.0, (0.1, 0.2, 0.2, 0.2, 0.2, 0.1), key="education_probs")
-employment_probs = st.slider('Employment Probabilities', 0.0, 1.0, (0.8, 0.2), key="employment_probs")
-income_probs = st.slider('Income Probabilities', 0.0, 1.0, (0.4, 0.3, 0.3), key="income_probs")
-social_status_probs = st.slider('Social Status Probabilities',
+education_probs = st.slider('Education Probabilities', 0.0, 1.0, value=[0.1, 0.2, 0.2, 0.2, 0.2, 0.1])
+employment_probs = st.slider('Employment Probabilities', 0.0, 1.0, value=[0.8, 0.2])
+income_probs = st.slider('Income Probabilities', 0.0, 1.0, value=[0.4, 0.3, 0.3])
+social_status_probs = st.slider('Social Status Probabilities', 0.0, 1.0, value=[0.6, 0.4])
+relatives_abroad_prob = st.slider('Relatives Abroad Probability', 0.0, 1.0, value=0.2)
+
+education_probs = [p/sum(education_probs) for p in education_probs]
+employment_probs = [p/sum(employment_probs) for p in employment_probs]
+income_probs = [p/sum(income_probs) for p in income_probs]
+social_status_probs = [p/sum(social_status_probs) for p in social_status_probs]
+
+if st.button('Generate and Plot Data'):
+    persons, accommodation_counts = create_persons_and_plot(num_persons, education_probs, employment_probs, income_probs, social_status_probs, relatives_abroad_prob)
+    
+    accommodation_water, accommodation_electricity, accommodation_heating, accommodation_cooling, accommodation_land = calculate_resource_usage(persons)
+    
+    st.subheader('Resource Usage')
+    
+    st.write('### Water Usage')
+    plot_resource_usage('Water', list(accommodation_water.values()), list(accommodation_water.keys()))
+    
+    st.write('### Electricity Usage')
+    plot_resource_usage('Electricity', list(accommodation_electricity.values()), list(accommodation_electricity.keys()))
+    
+    st.write('### Heating Usage')
+    plot_resource_usage('Heating', list(accommodation_heating.values()), list(accommodation_heating.keys()))
+    
+    st.write('### Cooling Usage')
+    plot_resource_usage('Cooling', list(accommodation_cooling.values()), list(accommodation_cooling.keys()))
+    
+    st.write('### Land Usage')
+    plot_resource_usage('Land', list(accommodation_land.values()), list(accommodation_land.keys()))
